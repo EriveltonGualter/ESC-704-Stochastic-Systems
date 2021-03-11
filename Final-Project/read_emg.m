@@ -1,39 +1,38 @@
-function [ emg ] = read_emg(raw)
-    % emg = read_emg(raw)   
-% 
-%     This function creates the structure data for EMG data
-% 
-%     INPUTS:
-%         raw = [n, 24] = Raw Data 
-%
-%     OUTPUTS:
-%         sw = Forces and Moments structure
-%             .Sn = Sample Number 
-%             .av = 1/20 second running average velocity [m/s]
-%             .Fx = Force [N]
+function [ emg ] = read_emg(trial)
 
-    % SSynchronization of arrays raw.data and raw.textdat
-    s = size(raw.data);
-    raw.data = cat(1, ones(1,s(1,2)), raw.data);
+    %% Set up the Import Options and import the data
+    opts = delimitedTextImportOptions("NumVariables", 20);
+
+    % Specify range and delimiter
+    opts.DataLines = [1, Inf];
+    opts.Delimiter = ",";
+
+    % Specify column names and types
+    opts.VariableNames = ["Var1", "Signal", "Frame", "Seconds", "Channels_1", "VarName6", "VarName7", "VarName8", "VarName9", "VarName10", "VarName11", "VarName12", "VarName13", "VarName14", "Var15", "Var16", "Var17", "Var18", "Var19", "Var20"];
+    opts.SelectedVariableNames = ["Signal", "Frame", "Seconds", "Channels_1", "VarName6", "VarName7", "VarName8", "VarName9", "VarName10", "VarName11", "VarName12", "VarName13", "VarName14"];
+    opts.VariableTypes = ["string", "categorical", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "string", "string", "string", "string", "string", "string"];
+
+    % Specify file level properties
+    opts.ExtraColumnsRule = "ignore";
+    opts.EmptyLineRule = "read";
+
+    % Specify variable properties
+    opts = setvaropts(opts, ["Var1", "Var15", "Var16", "Var17", "Var18", "Var19", "Var20"], "WhitespaceRule", "preserve");
+    opts = setvaropts(opts, ["Var1", "Signal", "Var15", "Var16", "Var17", "Var18", "Var19", "Var20"], "EmptyFieldRule", "auto");
+
+    % Import the data
+    emg_raw = readtable(append("trial0",num2str(trial),"/wc",num2str(trial),"-Delsys 1.csv"), opts);
+
+    idx = find(emg_raw.Signal == 'EMG'); 
     
-    ii = 1;
-    for i=1:length(raw.data)
-        if raw.textdata(i,1) == "EMG"   % Just save the EMG data
-            
-            emg.frame(ii,1) = raw.data(i,1);
-            emg.t(ii,1) = raw.data(i,2);
-            emg.ch1(ii,1) = raw.data(i,3);
-            emg.ch2(ii,1) = raw.data(i,4);
-            emg.ch3(ii,1) = raw.data(i,5);
-            emg.ch4(ii,1) = raw.data(i,6);
-            emg.ch5(ii,1) = raw.data(i,7);
-            emg.ch6(ii,1) = raw.data(i,8);
-            emg.ch7(ii,1) = raw.data(i,9);
-            emg.ch8(ii,1) = raw.data(ii,10);
-            emg.ch9(ii,1) = raw.data(ii,11);
-            emg.ch10(ii,1) = raw.data(ii,12);   
-            
-            ii = ii + 1;
-        end
-    end
-end
+    emg(:,1)    = emg_raw.Seconds(idx);
+    emg(:,2)    = emg_raw.Channels_1(idx);
+    emg(:,3)    = emg_raw.VarName6(idx);
+    emg(:,4)    = emg_raw.VarName7(idx);
+    emg(:,5)    = emg_raw.VarName8(idx);
+    emg(:,6)    = emg_raw.VarName9(idx);
+    emg(:,7)    = emg_raw.VarName10(idx);
+    emg(:,8)    = emg_raw.VarName11(idx);
+    emg(:,9)    = emg_raw.VarName12(idx);
+    emg(:,10)   = emg_raw.VarName13(idx);
+    emg(:,11)   = emg_raw.VarName14(idx);

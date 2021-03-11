@@ -1,4 +1,4 @@
-function plots( trc, swl, swr )
+function plots(swl, swr )
 % sw = read_sw(raw)   
 % 
 %     This function is ...
@@ -10,7 +10,7 @@ function plots( trc, swl, swr )
 
     
     %% Plot Forces-left x Sample
-	figure(1);
+    fig = figure; fig.Renderer = 'painters';
        
     subplot(411); hold on
     plot(swl.Sn, swl.Fx,...
@@ -52,7 +52,7 @@ function plots( trc, swl, swr )
       
     
     %% Plot Moments-left x Sample
-	figure(2);
+    fig = figure; fig.Renderer = 'painters';
        
     subplot(411); hold on
     plot(swl.Sn, swl.Mx,...
