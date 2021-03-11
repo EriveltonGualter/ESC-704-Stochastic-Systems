@@ -1,5 +1,5 @@
-addpath('propulsion raw data-01')
-addpath('propulsion raw data-02')
+addpath('../propulsion raw data-01')
+addpath('../propulsion raw data-02')
 
 clear all
 close all
@@ -35,10 +35,10 @@ opts = setvaropts(opts, ["L5M", "VarName79", "VarName80"], "TrimNonNumeric", tru
 opts = setvaropts(opts, ["L5M", "VarName79", "VarName80"], "ThousandsSeparator", ",");
 
 % Import the data
-% propulsion= readtable("C:\Users\Erivelton\Documents\GitHub\Propulsion-Raw-Data\propulsion raw data-01\propulsion1.trc", opts);
-propulsion = readtable("C:\Users\Erivelton\Documents\GitHub\Propulsion-Raw-Data\propulsion raw data-01\propulsion2.trc", opts);
-% propulsion = readtable("C:\Users\Erivelton\Documents\GitHub\Propulsion-Raw-Data\propulsion raw data-01\propulsion3.trc", opts);
-% propulsion = readtable("C:\Users\Erivelton\Documents\GitHub\Propulsion-Raw-Data\propulsion raw data-01\propulsion4.trc", opts);
+% propulsion= readtable("../propulsion raw data-01/propulsion1.trc", opts);
+propulsion = readtable("../propulsion raw data-01/propulsion2.trc", opts);
+% propulsion = readtable("../propulsion raw data-01/propulsion3.trc", opts);
+% propulsion = readtable("../propulsion raw data-01/propulsion4.trc", opts);
 
 %% Clear temporary variables
 clear opts
