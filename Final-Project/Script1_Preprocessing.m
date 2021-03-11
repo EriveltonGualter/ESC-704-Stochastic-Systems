@@ -71,7 +71,7 @@ view([45 30])
 
 %%
 % Load Raw Data
-trc_raw = dlmread(      append('wc',    num2str(trial),'.trc'), '', 6, 0);           % Raw data from Tracker Position
+trc_raw = dlmread(      append('wc',    num2str(trial),'.trc'), '', 6, 0);          % Raw data from Tracker Position
 swl_raw = dlmread(      append('SW1-0', num2str(trial),'.csv'), ',');               % Raw data from Left SmartWheel
 swr_raw = dlmread(      append('SW2-0', num2str(trial),'.csv'), ',');               % Raw data from Right SmartWheel
 emg_raw = importdata(   append('wc',    num2str(trial),'-Delsys 1.csv'), ',', 1,1); % Raw data from EMG
