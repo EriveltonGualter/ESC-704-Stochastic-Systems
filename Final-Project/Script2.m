@@ -1,9 +1,15 @@
-clear all
+addpath('helpers');
 
-run('Script1_Preprocessing.m')
-close all
+if ~exist('propulsion','var') == 1
+    run('Script1_Preprocessing.m');
+end
 
-figure; hold on;
+close all;
+
+fig1 = figure; fig1.Renderer = 'painters'; hold on; box on;
+% fig2 = figure; fig2.Renderer = 'painters'; hold on; box on;
+
+set(0, 'CurrentFigure', fig1);
 rgbl = [0,0,0,.2];
 plot3(propulsion.IJ,	propulsion.VarName5	,	propulsion.VarName4,    'Color',rgbl);
 plot3(propulsion.PX,	propulsion.VarName8	,	propulsion.VarName7,    'Color',rgbl);
@@ -110,71 +116,95 @@ MK.RW.x  = M(27).x; MK.RW.y  = M(27).y; MK.RW.z  = M(27).z;
 MK.LW.x  = M(28).x; MK.LW.y  = M(28).y; MK.LW.z  = M(28).z; 
 
 %%
-
+set(0, 'CurrentFigure', fig1);
 cla; hold on; box on
 clearvars -global;
 clear global;
 
 view([62 17]);
 % view(2);
-global h;
+% view([0 0]);
+global h hw;
 
 varnames = propulsion.Properties.VariableNames;
 
 cp = [0 0 0];
 
-i = 1;
+simRealTime = 0;
+if simRealTime == 1
+    N = t(end);
+    i = 0;
+else
+    N = length(MK.C7.x);
+    i = 1;
+end
+
 time = 0;
 tic 
-while time < t(end)
-% for i=1:size(PM,1)
+while time < N
     
     if isempty(h)
-        [px,py,pz] = getSegment(MK.IJ,  MK.PX,t,time);  h(1) = plot3(px,py,pz,'LineWidth',1,'Color',cp);
-        [px,py,pz] = getSegment(MK.IJ,  MK.RAC,t,time); h(2) = plot3(px,py,pz,'LineWidth',1,'Color',cp);
-        [px,py,pz] = getSegment(MK.RAC, MK.RLE,t,time); h(3) = plot3(px,py,pz,'LineWidth',1,'Color',cp);
-        [px,py,pz] = getSegment(MK.RLE, MK.RRS,t,time); h(4) = plot3(px,py,pz,'LineWidth',1,'Color',cp);
-        [px,py,pz] = getSegment(MK.IJ,  MK.RAC,t,time); h(5) = plot3(px,py,pz,'LineWidth',1,'Color',cp);
-        [px,py,pz] = getSegment(MK.RAC, MK.RLE,t,time); h(6) = plot3(px,py,pz,'LineWidth',1,'Color',cp);
-        [px,py,pz] = getSegment(MK.RLE, MK.RRS,t,time); h(7) = plot3(px,py,pz,'LineWidth',1,'Color',cp);
+%         [px,py,pz] = getSegment(MK.T8,  MK.C7,t,time,i);  h(1) = plot3(px,py,pz,'LineWidth',1,'Color',cp);
+        [px,py,pz] = getSegment(MK.IJ,  MK.PX,t,time,i);  h(2) = plot3(px,py,pz,'LineWidth',1,'Color',cp);
+        [px,py,pz] = getSegment(MK.IJ,  MK.RAC,t,time,i); h(3) = plot3(px,py,pz,'LineWidth',1,'Color',cp);
+        [px,py,pz] = getSegment(MK.RAC, MK.RLE,t,time,i); h(4) = plot3(px,py,pz,'LineWidth',1,'Color',cp);
+        [px,py,pz] = getSegment(MK.RLE, MK.RRS,t,time,i); h(5) = plot3(px,py,pz,'LineWidth',1,'Color',cp);
+        [px,py,pz] = getSegment(MK.IJ,  MK.LAC,t,time,i); h(6) = plot3(px,py,pz,'LineWidth',1,'Color',cp);
+        [px,py,pz] = getSegment(MK.LAC, MK.LLE,t,time,i); h(7) = plot3(px,py,pz,'LineWidth',1,'Color',cp);
+        [px,py,pz] = getSegment(MK.LLE, MK.LRS,t,time,i); h(8) = plot3(px,py,pz,'LineWidth',1,'Color',cp);
         
-        [px,py,pz] = getSegment(MK.RW, MK.LW,t,time);   h(8) = plot3(px,py,pz,'LineWidth',1,'Color',cp);
+        [px,py,pz] = getSegment(MK.RW, MK.LW,t,time,i);   h(9) = plot3(px,py,pz,'LineWidth',1,'Color',cp);
     else
-        [px,py,pz] = getSegment(MK.IJ,  MK.PX,t,time);  set(h(1),'xData',px,'yData',py,'zData',pz);
-        [px,py,pz] = getSegment(MK.IJ,  MK.RAC,t,time); set(h(2),'xData',px,'yData',py,'zData',pz);
-        [px,py,pz] = getSegment(MK.RAC, MK.RLE,t,time); set(h(3),'xData',px,'yData',py,'zData',pz);
-        [px,py,pz] = getSegment(MK.RLE, MK.RRS,t,time); set(h(4),'xData',px,'yData',py,'zData',pz);
-        [px,py,pz] = getSegment(MK.IJ,  MK.LAC,t,time); set(h(5),'xData',px,'yData',py,'zData',pz);
-        [px,py,pz] = getSegment(MK.LAC, MK.LLE,t,time); set(h(6),'xData',px,'yData',py,'zData',pz);
-        [px,py,pz] = getSegment(MK.LLE, MK.LRS,t,time); set(h(7),'xData',px,'yData',py,'zData',pz);
+%         [px,py,pz] = getSegment(MK.T8,  MK.C7,t,time,i);  set(h(1),'xData',px,'yData',py,'zData',pz);
+        [px,py,pz] = getSegment(MK.IJ,  MK.PX,t,time,i);  set(h(2),'xData',px,'yData',py,'zData',pz);
+        [px,py,pz] = getSegment(MK.IJ,  MK.RAC,t,time,i); set(h(3),'xData',px,'yData',py,'zData',pz);
+        [px,py,pz] = getSegment(MK.RAC, MK.RLE,t,time,i); set(h(4),'xData',px,'yData',py,'zData',pz);
+        [px,py,pz] = getSegment(MK.RLE, MK.RRS,t,time,i); set(h(5),'xData',px,'yData',py,'zData',pz);
+        [px,py,pz] = getSegment(MK.IJ,  MK.LAC,t,time,i); set(h(6),'xData',px,'yData',py,'zData',pz);
+        [px,py,pz] = getSegment(MK.LAC, MK.LLE,t,time,i); set(h(7),'xData',px,'yData',py,'zData',pz);
+        [px,py,pz] = getSegment(MK.LLE, MK.LRS,t,time,i); set(h(8),'xData',px,'yData',py,'zData',pz);
         
-        [px,py,pz] = getSegment(MK.RW, MK.LW,t,time);   set(h(8),'xData',px,'yData',py,'zData',pz);
+        [px,py,pz] = getSegment(MK.RW, MK.LW,t,time,i);   set(h(9),'xData',px,'yData',py,'zData',pz);
         
     end
     
+    hw = plotwheels(MK.RW,MK.LW,t,time,i,hw);
+    
 %     view([45 30]); 
     axis equal; axis([-1.5e3 5e3 -.5e3 .5e3 0 1.5e3]); 
-    set(gca,'xtick',[],'ytick',[],'ztick',[])
+%     set(gca,'xtick',[],'ytick',[],'ztick',[])
 %     xlabel('x'); ylabel('y'); zlabel('z'); 
 
     drawnow
     
     % Update current time
-    time = toc;
+    if simRealTime == 1
+        time = toc;
+    else
+        time = i + 1;
+        i = time;
+    end
+end
+%%
+for i=1:length(MK.RAC.x)
+    P1 = MK.RAC;
+    P2 = MK.RLE;
+    P3 = MK.RLE;
+    P4 = MK.RRS;
+    JRE(i) = getAngle(P1, P2, P3, P4, i);
+    
+    P1 = MK.LAC;
+    P2 = MK.LLE;
+    P3 = MK.LLE;
+    P4 = MK.LRS;
+    JLE(i) = getAngle(P1, P2, P3, P4, i);
 end
 
+% set(0, 'CurrentFigure', fig2);
+% subplot(211); plot(rad2deg(JRE));
+% subplot(212); plot(rad2deg(JLE));
 
-function [px,py,pz] = getSegment(A,B,t,time)   
-    max = interp1(t',A.x',time')';
-    may = interp1(t',A.y',time')';
-    maz = interp1(t',A.z',time')';
-    
-    mbx = interp1(t',B.x',time')';
-    mby = interp1(t',B.y',time')';
-    mbz = interp1(t',B.z',time')';
-    
-    px = [mbx max];
-    py = [mby may];
-    pz = [mbz maz];
-end
+
+
+
 
