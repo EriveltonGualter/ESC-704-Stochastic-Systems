@@ -1,15 +1,13 @@
+% clear all
+
 addpath('helpers');
 
-if ~exist('propulsion','var') == 1
-    run('Script1_Preprocessing.m');
-end
+% trial = 1;
+run('Script1_Preprocessing.m');
 
-close all;
+%%
+set(0, 'CurrentFigure', fig(1))
 
-fig1 = figure; fig1.Renderer = 'painters'; hold on; box on;
-% fig2 = figure; fig2.Renderer = 'painters'; hold on; box on;
-
-set(0, 'CurrentFigure', fig1);
 rgbl = [0,0,0,.2];
 plot3(propulsion.IJ,	propulsion.VarName5	,	propulsion.VarName4,    'Color',rgbl);
 plot3(propulsion.PX,	propulsion.VarName8	,	propulsion.VarName7,    'Color',rgbl);
@@ -40,7 +38,10 @@ plot3(propulsion.L5M,	propulsion.VarName80,	propulsion.VarName79,   'Color',rgbl
 plot3(propulsion.RW,	propulsion.VarName83,	propulsion.VarName82,   'Color',rgbl);
 plot3(propulsion.LW,	propulsion.VarName86,	propulsion.VarName85,   'Color',rgbl);
 
-view([45 30]); axis equal; axis([-1.5e3 5e3 -.5e3 .5e3 0 1.5e3]); xlabel('x'); ylabel('y'); zlabel('z');
+view([62 17]);
+% view([45 30]);
+axis equal; axis([-1.5e3 5e3 -.5e3 .5e3 0 1.5e3]); 
+% xlabel('x'); ylabel('y'); zlabel('z');
 
 %%
 PosMarker = [ ...
@@ -75,16 +76,86 @@ PosMarker = [ ...
     propulsion.Time];
 
 PM = PosMarker;
-PM(any(isnan(PM), 2), :) = [];
+PM(1:find(PM(:,end)==0, 1, 'last'), :) = [];
+
+PM(1:find(PM(:,end)<=tanc(1), 1, 'last'), :) = [];
+PM(find(PM(:,end)<=tanc(end), 1, 'last'):end, :) = [];
 
 t = PM(:,end)-PM(1,end);
 
+% PM(any(isnan(PM), 2), :) = [];
+
+%%
+f1 = length(t)/t(end);
+f2 = length(swl.Fx)/t(end);
+
+t2 = 0:1/f2:(length(swl.Fx)-1)*1/f2;
+t2new = 0:1/f1:t2(end);
+
+% PM(find(PM(:,end)<=t2new(end), 1, 'last'):end, :) = [];
+
+swl2.Fx = interp1(t2,swl.Fx,t2new);
+swl2.Fy = interp1(t2,swl.Fy,t2new);
+swl2.Fz = interp1(t2,swl.Fz,t2new);
+swl2.F  = sqrt(swl2.Fx.*swl2.Fx + swl2.Fy.*swl2.Fy + swl2.Fz.*swl2.Fz);
+swl2.Mx = interp1(t2,swl.Mx,t2new);
+swl2.My = interp1(t2,swl.My,t2new);
+swl2.Mz = interp1(t2,swl.Mz,t2new);
+swl2.M  = sqrt(swl2.Mx.*swl2.Mx + swl2.My.*swl2.My + swl2.Mz.*swl2.Mz);
+swl2.t  = t2new;
+
+t2 = 0:1/f2:(length(swr.Fx)-1)*1/f2;
+t2new = 0:1/f1:t2(end);
+
+swr2.Fx = interp1(t2,swr.Fx,t2new);
+swr2.Fy = interp1(t2,swr.Fy,t2new);
+swr2.Fz = interp1(t2,swr.Fz,t2new);
+swr2.F  = sqrt(swr2.Fx.*swr2.Fx + swr2.Fy.*swr2.Fy + swr2.Fz.*swr2.Fz);
+swr2.Mx = interp1(t2,swr.Mx,t2new);
+swr2.My = interp1(t2,swr.My,t2new);
+swr2.Mz = interp1(t2,swr.Mz,t2new);
+swr2.M  = sqrt(swr2.Mx.*swr2.Mx + swr2.My.*swr2.My + swr2.Mz.*swr2.Mz);
+swr2.t  = t2new;
+
+set(0, 'CurrentFigure', fig(2))
+plots( swl2, swr2 );
+
+%%
+idx = find((any(isnan(PM), 2)) ~= 1);
+
+swl2.Fx = swl2.Fx(idx);
+swl2.Fy = swl2.Fy(idx);
+swl2.Fz = swl2.Fz(idx);
+swl2.F  = swl2.F(idx);
+swl2.Mx = swl2.Mx(idx);
+swl2.My = swl2.My(idx);
+swl2.Mz = swl2.Mz(idx);
+swl2.M  = swl2.M(idx);
+swl2.t  = swl2.t(idx);
+
+swr2.Fx = swr2.Fx(idx);
+swr2.Fy = swr2.Fy(idx);
+swr2.Fz = swr2.Fz(idx);
+swr2.F  = swr2.F(idx);
+swr2.Mx = swr2.Mx(idx);
+swr2.My = swr2.My(idx);
+swr2.Mz = swr2.Mz(idx);
+swr2.M  = swr2.M(idx);
+swr2.t  = swr2.t(idx);
+
+PM = PM(idx,:);
+t = t(idx);
+t = t - t(1);
+
+%%
 j = 1;
 for i=1:28
     M(i).x = PM(:,j); j=j+1;
     M(i).y = PM(:,j); j=j+1;
     M(i).z = PM(:,j); j=j+1;
 end
+
+%%
 
 MK.IJ.x  = M(1).x;  MK.IJ.y  = M(1).y;  MK.IJ.z  = M(1).z; 
 MK.PX.x  = M(2).x;  MK.PX.y  = M(2).y;  MK.PX.z  = M(2).z; 
@@ -116,30 +187,35 @@ MK.RW.x  = M(27).x; MK.RW.y  = M(27).y; MK.RW.z  = M(27).z;
 MK.LW.x  = M(28).x; MK.LW.y  = M(28).y; MK.LW.z  = M(28).z; 
 
 %%
-set(0, 'CurrentFigure', fig1);
+set(0, 'CurrentFigure', fig(3))
 cla; hold on; box on
 clearvars -global;
 clear global;
 
-view([62 17]);
+% view([62 17]);
 % view(2);
-% view([0 0]);
+view([0 0]);
+view([0 0 1])
 global h hw;
 
 varnames = propulsion.Properties.VariableNames;
 
 cp = [0 0 0];
 
-simRealTime = 0;
-if simRealTime == 1
-    N = t(end);
-    i = 0;
-else
-    N = length(MK.C7.x);
-    i = 1;
+simRealTime = 3;
+switch simRealTime
+    case 1
+        N = t(end);
+        i = 0;
+        time = 0;
+    case 2
+        N = length(MK.C7.x);
+        i = 1;
+    case 3
+        N = length(MK.C7.x);
+        time = Inf;
 end
 
-time = 0;
 tic 
 while time < N
     
@@ -170,12 +246,12 @@ while time < N
     
     hw = plotwheels(MK.RW,MK.LW,t,time,i,hw);
     
-%     view([45 30]); 
+    view([45 30]); 
     axis equal; axis([-1.5e3 5e3 -.5e3 .5e3 0 1.5e3]); 
-%     set(gca,'xtick',[],'ytick',[],'ztick',[])
+    set(gca,'xtick',[],'ytick',[],'ztick',[])
 %     xlabel('x'); ylabel('y'); zlabel('z'); 
 
-    drawnow
+    drawnow;
     
     % Update current time
     if simRealTime == 1
@@ -191,20 +267,46 @@ for i=1:length(MK.RAC.x)
     P2 = MK.RLE;
     P3 = MK.RLE;
     P4 = MK.RRS;
-    JRE(i) = getAngle(P1, P2, P3, P4, i);
+    REJ(i) = getAngle(P1, P2, P3, P4, i);   % Right Elbow Joint 
     
     P1 = MK.LAC;
     P2 = MK.LLE;
     P3 = MK.LLE;
     P4 = MK.LRS;
-    JLE(i) = getAngle(P1, P2, P3, P4, i);
+    LEJ(i) = getAngle(P1, P2, P3, P4, i);   % Left Elbow Joint 
+
+    P1 = MK.RAC;
+    P2 = MK.RLE;
+    P3 = MK.PX;
+    P4 = MK.IJ;
+    RSJ(i) = getAngle(P1, P2, P3, P4, i);   % Right Shoulder Joint 
+    
+    P1 = MK.LAC;
+    P2 = MK.LLE;
+    P3 = MK.PX;
+    P4 = MK.IJ;
+    LSJ(i) = getAngle(P1, P2, P3, P4, i);   % LEFT Shoulder Joint 
 end
 
-% set(0, 'CurrentFigure', fig2);
-% subplot(211); plot(rad2deg(JRE));
-% subplot(212); plot(rad2deg(JLE));
+set(0, 'CurrentFigure', fig(4))
+subplot(221); box on; hold on; plot(t, rad2deg(REJ));
+subplot(222); box on; hold on; plot(t, rad2deg(LEJ));
+subplot(223); box on; hold on; plot(t, rad2deg(RSJ));
+subplot(224); box on; hold on; plot(t, rad2deg(LSJ));
 
+%%
 
+set(0, 'CurrentFigure', fig(5))
+
+subplot(221); hold on; box on; peaks = plotStride(REJ);
+subplot(222); hold on; box on; plotStride(LEJ,peaks);
+subplot(223); hold on; box on; plotStride(RSJ,peaks);
+subplot(224); hold on; box on; plotStride(LSJ,peaks);
+
+%%
+for i=1:length(fig)
+    fig(i).Visible = 'off';
+end
 
 
 
