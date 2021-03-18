@@ -21,7 +21,11 @@ function [ emg ] = read_emg(trial)
     opts = setvaropts(opts, ["Var1", "Signal", "Var15", "Var16", "Var17", "Var18", "Var19", "Var20"], "EmptyFieldRule", "auto");
 
     % Import the data
-    emg_raw = readtable(append("trial0",num2str(trial),"/wc",num2str(trial),"-Delsys 1.csv"), opts);
+    if trial < 10
+        emg_raw = readtable(append("trial0",num2str(trial),"/wc",num2str(trial),"-Delsys 1.csv"), opts);
+    else
+        emg_raw = readtable(append("trial",num2str(trial),"/wc",num2str(trial),"-Delsys 1.csv"), opts);
+    end
 
     idx = find(emg_raw.Signal == 'EMG'); 
     
