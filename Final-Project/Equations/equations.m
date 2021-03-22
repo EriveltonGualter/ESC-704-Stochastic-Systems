@@ -3,13 +3,13 @@ clc
 
 syms t real
 
-syms x bt ap xc b a R1 R2 A xdot btdot apdot
+syms x bt ap xc a b A B R1 R2 xdot btdot apdot
 
 % gamma = x/R2;
 
 rc = [x+xc];
 rb = [x+b*sin(bt); -b*cos(bt)];
-ra = [x+b*sin(bt)+a*sin(bt+ap); -b*cos(bt)-a*cos(bt+ap)];
+ra = [x+B*sin(bt)+a*sin(bt+ap); -B*cos(bt)-a*cos(bt+ap)];
 rr = [x+xc];
 thb = bt;
 tha = bt+ap;
@@ -32,7 +32,7 @@ qddot = diff(qdot,t);
 
 rc = [x+xc];
 rb = [x+b*sin(bt); -b*cos(bt)];
-ra = [x+b*sin(bt)+a*sin(bt+ap); -b*cos(bt)-a*cos(bt+ap)];
+ra = [x+B*sin(bt)+a*sin(bt+ap); -B*cos(bt)-a*cos(bt+ap)];
 rr = [x+xc];
 thb = bt;
 tha = bt+ap;
@@ -69,10 +69,15 @@ K = simplify(J.'*Mb*Jdot*[xdot; btdot; apdot]);
 kg = simplify(J.'*fe1);
 G = simplify(J.'*fe2);%*[Fx; Fy];
 H = simplify(J.'*fe3);%*[tauo; tauc];
-Q = simplify(J.'*fe4);%*Frol;
+Q = simplify(J.'*fe4)*Frol;
 
 Ke = simplify( kg + G + H + Q);
 
 syms h v
 c = [b*sin(bt)+a*sin(ap)-h+R1*cos(x/R2); b*cos(bt)+a*cos(ap)-v+R1*sin(x/R2)]; 
+
+
+dyn = matlabFunction(M,K,kg,G,H,Q,'File','dyn_propulsion');
+
+help dyn_propulsion
 
