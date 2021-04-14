@@ -1,5 +1,10 @@
 addpath(genpath(pwd))
 
+if ~exist('trial','var')
+    trial = 2;
+end
+
+
 %% Import data from text file
 % Script for importing data from the following text file:
 

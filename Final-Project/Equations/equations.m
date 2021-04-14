@@ -76,6 +76,7 @@ Ke = simplify( kg + G + H + Q);
 syms h v
 c = [b*sin(bt)+a*sin(ap)-h+R1*cos(x/R2); b*cos(bt)+a*cos(ap)-v+R1*sin(x/R2)]; 
 
+qddot = M\(kg + G*[Fx; Fy] + H*[tauo; tauc] + Q - K)
 
 dyn = matlabFunction(M,K,kg,G,H,Q,'File','dyn_propulsion');
 
