@@ -1,11 +1,10 @@
-clear all
 
 addpath('helpers');
 
 % trial = 2;
-if ~exist('swl2', 'var')
+% if ~exist('swl2', 'var')
     run('Script2.m');
-end
+% end
 dt = 1/f1;
 
 % Assembly U
@@ -30,14 +29,14 @@ x_wl = sqrt(sum([MK.LW.x MK.LW.y MK.LW.z].^2,2))*1e-3;
 dx_wr = diff([x_wr; x_wr(end)])/dt;
 dx_wl = diff([x_wl; x_wl(end)])/dt;
 
-figure;
-subplot(221); plot(t, x_wr);
-subplot(222); plot(t, x_wl);
-subplot(223); plot(t, dx_wr);
-subplot(224); plot(t, dx_wl);
+% figure;
+% subplot(221); plot(t, x_wr);
+% subplot(222); plot(t, x_wl);
+% subplot(223); plot(t, dx_wr);
+% subplot(224); plot(t, dx_wl);
 
 %%
-% figure;
+figure;
 clf
 box on; hold on;
 plot(t, -REJ2(:,1));
@@ -45,9 +44,19 @@ plot(t, 1.8*RSJ);
 drawnow
 
 %% ALL PLOTS
-close all
 figure; 
 plotDTforRegression(swl2, swr2, REJ2, LEJ2, RSJ, LSJ, x_wr, x_wl, dx_wr, dx_wl)
+
+% saveas(gcf,['plotresults/data_trial',num2str(idfig),'.pdf'])
+
+set(gcf,'renderer','Painters')
+% saveas(gcf,['plotresults/gpr_trial',num2str(idfig),'.pdf'])
+set(gcf,'Units','Inches');
+pos = get(gcf,'Position');
+set(gcf,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+print(gcf,['plotresults/data_trial',num2str(idfig)],'-dpdf','-r0')
+
+
 clc
 % add some noise
 swlnoise    = addNoise(swl2, 5);
@@ -65,6 +74,14 @@ dx_wlnoise  = addNoise(dx_wl, 0.1);
 plotDTforRegression(swlnoise, swrnoise, REJnoise, LEJnoise, RSJnoise, ...
     LSJnoise, x_wrnoise, x_wlnoise, dx_wrnoise, dx_wlnoise)
 
+% saveas(gcf,['plotresults/data_trial_extra_noise',num2str(idfig),'.pdf'])
+
+set(gcf,'renderer','Painters')
+% saveas(gcf,['plotresults/gpr_trial',num2str(idfig),'.pdf'])
+set(gcf,'Units','Inches');
+pos = get(gcf,'Position');
+set(gcf,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+print(gcf,['plotresults/data_trial_extra_noise',num2str(idfig)],'-dpdf','-r0')
 
 function out = addNoise(sig, amplitude)
 

@@ -1,13 +1,31 @@
 % clear all
+% close all
 
 addpath('helpers');
 
-% trial = 1;
+plotFlag = 1;
+
+% trial = 2;
+if ~exist('trial', 'var')
+    trial = 2;
+end
+if plotFlag
+if ~exist('fig', 'var')
+    for i=1:6
+        fig(i) = figure; fig(i).Renderer = 'painters'; hold on; box on; 
+        fig(i).Visible = 'off';
+    end
+end
+end
+
+% Extract data
 run('Script1_Preprocessing.m');
 
-%%
-set(0, 'CurrentFigure', fig(1))
 
+%%
+if plotFlag
+set(0, 'CurrentFigure', fig(1))
+hold on;
 rgbl = [0,0,0,.2];
 plot3(propulsion.IJ,	propulsion.VarName5	,	propulsion.VarName4,    'Color',rgbl);
 plot3(propulsion.PX,	propulsion.VarName8	,	propulsion.VarName7,    'Color',rgbl);
@@ -42,7 +60,7 @@ view([62 17]);
 % view([45 30]);
 axis equal; axis([-1.5e3 5e3 -.5e3 .5e3 0 1.5e3]); 
 % xlabel('x'); ylabel('y'); zlabel('z');
-
+end
 %%
 PosMarker = [ ...
     propulsion.IJ,	propulsion.VarName5	,	propulsion.VarName4, ...
@@ -117,9 +135,6 @@ swr2.Mz = interp1(t2,swr.Mz,t2new);
 swr2.M  = sqrt(swr2.Mx.*swr2.Mx + swr2.My.*swr2.My + swr2.Mz.*swr2.Mz);
 swr2.t  = t2new;
 
-set(0, 'CurrentFigure', fig(2))
-plots( swl2, swr2 );
-
 %%
 idx = find((any(isnan(PM), 2)) ~= 1);
 
@@ -146,7 +161,13 @@ swr2.t  = swr2.t(idx);
 PM = PM(idx,:);
 t = t(idx);
 t = t - t(1);
+swl2.t = swr2.t - swl2.t(1);
+swr2.t = swr2.t - swr2.t(1);
 
+if plotFlag
+set(0, 'CurrentFigure', fig(2))
+plots( swl2, swr2);
+end
 %%
 j = 1;
 for i=1:28
@@ -187,7 +208,10 @@ MK.RW.x  = M(27).x; MK.RW.y  = M(27).y; MK.RW.z  = M(27).z;
 MK.LW.x  = M(28).x; MK.LW.y  = M(28).y; MK.LW.z  = M(28).z; 
 
 %%
-set(0, 'CurrentFigure', fig(3))
+if plotFlag
+set(0, 'CurrentFigure', fig(3)); 
+fig(3).Visible ='on';
+
 cla; hold on; box on
 clearvars -global;
 clear global;
@@ -196,13 +220,14 @@ clear global;
 % view(2);
 view([0 0]);
 view([0 0 1])
+end
 global h hw;
 
 varnames = propulsion.Properties.VariableNames;
 
 cp = [0 0 0];
 
-simRealTime = 3;
+simRealTime = 1;
 switch simRealTime
     case 1
         N = t(end);
@@ -216,6 +241,7 @@ switch simRealTime
         time = Inf;
 end
 
+if plotFlag
 tic 
 while time < N
     
@@ -261,6 +287,7 @@ while time < N
         i = time;
     end
 end
+end
 %%
 for i=1:length(MK.RAC.x)
     P1 = MK.RAC;
@@ -268,45 +295,67 @@ for i=1:length(MK.RAC.x)
     P3 = MK.RLE;
     P4 = MK.RRS;
     REJ(i) = getAngle(P1, P2, P3, P4, i);   % Right Elbow Joint 
+    REJ2(i,:) = getAngle2(P1, P2, P3, P4, i);   % Right Elbow Joint 
     
     P1 = MK.LAC;
     P2 = MK.LLE;
     P3 = MK.LLE;
     P4 = MK.LRS;
     LEJ(i) = getAngle(P1, P2, P3, P4, i);   % Left Elbow Joint 
+    LEJ2(i,:) = getAngle2(P1, P2, P3, P4, i);   % Left Elbow Joint 
 
     P1 = MK.RAC;
     P2 = MK.RLE;
     P3 = MK.PX;
     P4 = MK.IJ;
     RSJ(i) = getAngle(P1, P2, P3, P4, i);   % Right Shoulder Joint 
+    RSJ2(i,:) = getAngle2(P1, P2, P3, P4, i);   % Right Shoulder Joint 
     
     P1 = MK.LAC;
     P2 = MK.LLE;
     P3 = MK.PX;
     P4 = MK.IJ;
     LSJ(i) = getAngle(P1, P2, P3, P4, i);   % LEFT Shoulder Joint 
+    LSJ2(i,:) = getAngle2(P1, P2, P3, P4, i);   % LEFT Shoulder Joint 
 end
 
-set(0, 'CurrentFigure', fig(4))
-subplot(221); box on; hold on; plot(t, rad2deg(REJ));
-subplot(222); box on; hold on; plot(t, rad2deg(LEJ));
-subplot(223); box on; hold on; plot(t, rad2deg(RSJ));
-subplot(224); box on; hold on; plot(t, rad2deg(LSJ));
+REJ = rad2deg(REJ);
+LEJ = rad2deg(LEJ);
+RSJ = rad2deg(RSJ);
+LSJ = rad2deg(LSJ);
+REJ2 = rad2deg(REJ2);
+LEJ2 = rad2deg(LEJ2);
+RSJ2 = rad2deg(RSJ2);
+LSJ2 = rad2deg(LSJ2);
 
-%%
+ANG = [REJ' REJ2 LEJ' LEJ2 RSJ' RSJ2 LSJ' LSJ2];
+
+if plotFlag
+set(0, 'CurrentFigure', fig(4))
+
+k = 0;
+for i=reshape(reshape(1:16,4,4).',1,16)
+    k = k +1;
+    subplot(4,4,i); box on; hold on; plot(t, 90-ANG(:,k));
+end
+
 
 set(0, 'CurrentFigure', fig(5))
+subplot(221); box on; hold on; plot(t, REJ);
+subplot(222); box on; hold on; plot(t, LEJ);
+subplot(223); box on; hold on; plot(t, RSJ);
+subplot(224); box on; hold on; plot(t, LSJ);
+
+set(0, 'CurrentFigure', fig(6))
 
 subplot(221); hold on; box on; peaks = plotStride(REJ);
 subplot(222); hold on; box on; plotStride(LEJ,peaks);
 subplot(223); hold on; box on; plotStride(RSJ,peaks);
 subplot(224); hold on; box on; plotStride(LSJ,peaks);
 
-%%
 for i=1:length(fig)
-    fig(i).Visible = 'off';
+    fig(i).Visible = 'on';
 end
-
+end
 
 
